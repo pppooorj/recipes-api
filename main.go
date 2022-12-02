@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/xid"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -20,8 +22,11 @@ type Recipe struct {
 
 func init() {
 	recipes = make([]Recipe, 0)
-}
+	//	read file recipes.json
 
+	file, _ := os.ReadFile("recipes.json")
+	_ = json.Unmarshal(file, &recipes)
+}
 func NewRecipeHandler(c *gin.Context) {
 	var recipe Recipe
 
@@ -35,8 +40,13 @@ func NewRecipeHandler(c *gin.Context) {
 	c.JSON(http.StatusCreated, recipe)
 }
 
+func ListRecipesHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, recipes)
+}
+
 func main() {
 	router := gin.Default()
 	router.POST("/recipes", NewRecipeHandler)
+	router.GET("/recipes", ListRecipesHandler)
 	router.Run(":8080")
 }
