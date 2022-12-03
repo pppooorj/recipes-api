@@ -81,11 +81,26 @@ func DeleteRecipeHandler(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
+func SearchRecipeHandler(c *gin.Context) {
+	tag := c.Query("tag")
+	listOfRecipes := make([]Recipe, 0)
+
+	for i := range recipes {
+		for j := range recipes[i].Tags {
+			if recipes[i].Tags[j] == tag {
+				listOfRecipes = append(listOfRecipes, recipes[i])
+			}
+		}
+	}
+	c.JSON(http.StatusOK, listOfRecipes)
+}
+
 func main() {
 	router := gin.Default()
 	router.POST("/recipes", NewRecipeHandler)
 	router.GET("/recipes", ListRecipesHandler)
 	router.PUT("/recipes/:id", UpdateRecipeHandler)
 	router.DELETE("/recipes/:id", DeleteRecipeHandler)
+	router.GET("/recipes/search", SearchRecipeHandler)
 	router.Run(":8080")
 }
